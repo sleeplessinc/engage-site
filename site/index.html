@@ -1,0 +1,805 @@
+<html>
+	<head>
+		<title> ➔ Engage </title>
+
+		<meta charset="UTF-8">
+		<link rel="icon" href="/icon.png">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<link rel="stylesheet" href="/local.css">
+
+		<script src="/socket.io/socket.io.js"></script>
+
+		<script src="/sleepless.js"></script>
+		<script src="/replicate.js"></script>
+
+	</head>
+
+
+	<body>
+
+		<div class=alldatshit>
+
+			<script>
+
+				let doc = document;
+				let loc = doc.location;
+				let path = loc.pathname
+
+				function set_uid( key, uid ) {
+					return LS.set( "uid_" + key, uid );
+				}
+
+				function get_uid( key ) {
+					return LS.get( "uid_" + key );
+				}
+
+				//var socket = io.connect( ":" + loc.port );
+				//var socket = io.connect( "https://engage.sleepless.com:44300/" );
+				var socket = io.connect( "https://engage.sleepless.com:" + loc.port + "/" );
+
+				socket.emit( "hello", { }, data => {
+					console.log( "hello : " + data.hail );
+				});
+
+			</script>
+
+
+			<!--a href="/"><h1>Street Epistemology <span class="blue">➔</span> Engage</h1></a-->
+			<a href="/"><h1><span class="blue">➔</span> Engage</h1></a>
+
+
+			<div class="pg hid" id="start">
+
+				<h2>Start Interview</h2>
+
+				<form name=pretalk >
+					<table>
+						<tr>
+							<td > Enter a name for your interview </td>
+						</tr>
+						<tr>
+							<td > <input type=text name=talk_name > </td>
+						</tr>
+						<tr>
+							<td > <input type=submit value="Summon Interviewer" > </td>
+						</tr>
+					</table>
+				</form>
+
+				<script>
+					doc.forms.pretalk.onsubmit = function( evt ) {
+						//evt.preventDefault();
+						//let form = doc.forms.pretalk;
+						let els = evt.target.elements;
+						let talk_name = els.talk_name.value.trim();
+						socket.emit( "create", { name: "IL", talk_name }, data => {
+							if( ! data.error ) {
+								let key = data.key;
+								log( "talk page crated with key " + key );
+								let uid = data.uid;
+								if( uid ) {
+									set_uid( key, uid );
+
+									// XXX make this happen after prompting for note?
+									socket.emit( "user_notify", { key }, data => {
+										doc.location = "/talk/" + key;	// XXX shouldn't be required, ultimately
+									});
+
+								}
+							}
+						});
+						return false;
+					};
+				</script>
+				<p>
+
+			</div>
+
+
+			<div class="pg hid" id="home">
+
+				<h2>Welcome</h2>
+
+				This page is for people to engage in text based, epistemology interviews.
+				<p>
+
+				<button onclick="start()">Click Here To Be Interviewed</button>
+				<p>
+				<script>
+					function start() {
+						doc.location = "/start";
+					}
+				</script>
+				<p>
+
+				For more information
+				<a href="/about">Click Here</a>.
+				<p>
+
+				<h3>Current and Past Interviews</h3>
+				<table class=users width=100%>
+					<tr>
+						<td> Name </td>
+						<td> Viewers </td>
+						<td> Started </td>
+						<td> Length </td>
+					</tr>
+					<tr id=tpl_talk >
+						<td>
+							<a href="/talk/__key__">__talk_name__</a>
+						</td>
+						<td> __num_watchers__ </td>
+						<td> __started__ </td>
+						<td> __num_chats__ </td>
+					</tr>
+				</table>
+				<p>
+
+				<script>
+					replicate( "tpl_talk", [] );
+					let update_talk_list = function() {
+						socket.emit( "talk_list", {}, data => {
+
+							let talks = data.talks;
+
+							talks.forEach( talk => {
+								//if( ! talk.name ) {
+								//	talk.name = "Talk " + ts2my( talk.uts_created );
+								//}
+								talk.started = agoStr( talk.uts_created );
+								if( talk.num_watchers == 0 )
+									talk.num_watchers = "";
+							});
+
+							// order them by creation date
+							talks.sort( function( a, b ) {
+								if( a.uts_created < b.uts_created ) return 1
+								if( a.uts_created > b.uts_created ) return -1
+								return 0;
+							});
+
+							replicate( "tpl_talk", data.talks );
+						});
+					};
+					setInterval( update_talk_list, 1000 * 10 );
+					update_talk_list();
+
+
+				</script>
+
+
+			</div>
+
+
+			<div class="pg hid" id="about">
+
+				<h2>About</h2>
+
+				<!--
+				Street Epistemology is the practice of engaging others in
+				respectful, sincere, and open discussion
+				about the best ways of knowing what is true.
+				-->
+				Epistemology is the theory of knowledge,
+				especially with regard to its methods,
+				validity, and scope.
+				Epistemology is the investigation of what
+				distinguishes justified belief from opinion.
+				<p>
+
+				<p>
+				Interviews conducted using this site are a conversation between two parties:
+				<ol>
+					<li>An epistemology student (SE)</li>
+					<li>An interviewee or "interlocutor" (IL).</li>
+				</ol>
+				The IL chooses a belief that they are highly confident is true,
+				and the SE asks the IL questions about the belief.
+				There is no debating opinions or promoting ideologies.
+				The goal is to understand the epistemological underpinnings of
+				belief, irrespective of what the belief is.
+				<p>
+
+				The interviews are recorded into a database for future research and
+				reference.
+				They are not used for any commercial purpose.
+				No personally identifying information is collected.
+				For more information
+				<a href="/terms">Click Here</a>.
+				<p>
+
+				<h3>Volunteer</h3>
+
+				If you want to use this web page to conduct your own interviews,
+				and would like be notified when an IL comes to this page to request an interview,
+				<a href="/register">Click Here</a>.
+				<p>
+
+				<h3>Already a Volunteer?</h3>
+
+				<form name=notify_disable style="display:flex;">
+					Disable notifications: 
+					<input name=email type=text placeholder="Your email address">
+					<input type=submit value="Disable">
+				</form>
+				<script>
+				{
+					let form = doc.forms.notify_disable;
+					let els = form.elements;
+					form.onsubmit = function( evt ) {
+						let email = els.email.value.trim();
+						socket.emit( "user_notify_disable", { email }, data => {
+							if( data.error ) {
+								alert( "ERROR: " + data.error );
+							}
+							else {
+								alert( "Notifications disabled for email address '"+email+"'" );
+							}
+						});
+						return false;
+					}
+				}
+				</script>
+				<p>
+
+				<form name=notify_enable style="display:flex;">
+					Enable notifications: 
+					<input name=email type=text placeholder="Your email address">
+					<input type=submit value="Enable">
+				</form>
+				<script>
+				{
+					let form = doc.forms.notify_enable;
+					let els = form.elements;
+					form.onsubmit = function( evt ) {
+						let form = doc.forms.notify_enable;
+						let els = form.elements;
+						let email = els.email.value.trim();
+						socket.emit( "user_notify_enable", { email }, data => {
+							if( data.error ) {
+								alert( "ERROR: " + data.error );
+							}
+							else {
+								alert( "Notifications enabled for email address '"+email+"'" );
+							}
+						});
+						return false;
+					}
+				}
+				</script>
+
+
+			</div>
+
+
+			<div class="pg hid" id="dev">
+				<h2>Dev</h2>
+
+				<form name=test_msg >
+					<div style="display:flex;">
+						<section>
+							<h3>Send</h3>
+							Msg: <input name=msg type=text value="fetch"><br>
+							Data:
+							<textarea name=data>key TEST</textarea><br>
+							<br>
+							<input type=submit value="Send"><br>
+						</section>
+						<section>
+							<h3>Response</h3><br>
+							<div id=out></div><br>
+						</section>
+					</div>
+				</form>
+				<script>
+				{
+					let el = function( id ) { return doc.getElementById( id ); };
+					let form = doc.forms.test_msg;
+					form.onsubmit = evt => {
+						evt.preventDefault();
+						let msg = form.elements.msg.value;
+						let data = {};
+						let lines = form.elements.data.value.trim().split( /\n+/ );
+						lines.forEach( line => {
+							let words = line.split( /\s+/ );
+							let key = words.shift();
+							let val = words.join( " " );
+							data[ key ] = val;
+						});
+						log( "sending " + msg + ", " + o2j( data ) );
+						socket.emit( msg, data, rdata => {
+							el( "out" ).innerHTML = JSON.stringify( rdata );
+						});
+						return false;
+					}
+				}
+				</script>
+
+
+			</div>
+
+
+			<div class="pg hid" id=register_complete>
+				<h2>Registration Complete!</h2>
+
+				Thank you.  You're now registered to receive notifications
+				when someone visits the site and asks for an interview.
+				<p>
+
+				If you want to enable or disable your notifications in the
+				the future, you can do that from the Volunteer section
+				of the
+				<a href="/about">About Page</a>.
+
+			</div>
+
+
+			<div class="pg hid" id=register_confirm>
+				<h2>Registration Confirmation</h2>
+
+				To complete your registration, please enter the confirmation
+				code that was sent to you email address.
+				<p>
+
+				<form name=regconf>
+					<input type=text name=code placeholder="Enter confirmation code"><p>
+					<input type=submit value="Submit">
+				</form>
+				<p>
+
+				<script>
+					{
+						let f = doc.forms.regconf;
+						f.onsubmit = function( evt ) {
+
+							let els = f.elements;
+							let code = els.code.value.trim();
+							if( ! code ) {
+								alert( "Code required" );
+								return false;
+							}
+
+							socket.emit( "user_register_confirm", { code }, data => {
+								if( data.error ) {
+									alert( "ERROR: " + data.error );
+								}
+								if( ! data.error ) {
+									alert( "Account activated successfully" );
+									doc.location = "/register_complete";
+								}
+							});
+
+							return false;
+						}
+					}
+				</script>
+
+			</div>
+
+
+			<div class="pg hid" id=register>
+				<h2>Register</h2>
+
+				If you want to be registered to receive notifications when an IL requests
+				an interview, fill out this form.
+				You will be sent a confirmation email.  
+				Follow the instructions there to complete your registration.
+				<p>
+
+				After being registered, then when an IL requests an interview,
+				you'll be sent an email alert with a link.  Click the link and you
+				will be taken to the page where you can interview the IL.  Your name 
+				will appear as "SE" in the chat, and the IL will be "IL".
+				<p>
+
+				If you are not the first SE to arrive, you will only be able to view the conversation, but
+				can't participate.
+				<p>
+
+				<p class=memo>
+				Note: There isn't yet an option for receiving text message alerts, but it's in the works.
+				Also, the username and password aren't used yet, but you still need to enter something
+				so that you can submit the form.
+				</p>
+
+				<form name=regform>
+					<!--Full name <input type=text name=name placeholder="Your full name"><br-->
+					Email <input type=text name=email placeholder="Your email address"><p>
+					Username <input type=text name=username placeholder="Choose a username"><p>
+					Password <input type=password name=password placeholder="Choose a password"><p>
+					<p>
+					<input type=submit value="Register">
+					<p>
+				</form>
+
+				<script>
+					{
+						let f = doc.forms.regform;
+						f.onsubmit = function( evt ) {
+
+							let els = doc.forms.regform.elements;
+							let email = els.email.value.trim();
+							let username = els.username.value.trim();
+							let password = els.password.value.trim();
+							if( ! email ) {
+								alert( "Email address required" );
+								return false;
+							}
+							if( ! email.is_email() ) {
+								alert( "Invalid email addresss: " + email );
+								return false;
+							}
+							if( ! username ) {
+								alert( "Username required" );
+								return false;
+							}
+							if( ! password ) {
+								alert( "Password required" );
+								return false;
+							}
+
+							socket.emit( "user_register", { username, password, email }, data => {
+								if( data.error ) {
+									alert( "ERROR: " + data.error );
+								}
+								if( ! data.error ) {
+									doc.location = "/register_confirm";
+								}
+							});
+
+							return false;
+						}
+					}
+				</script>
+
+			</div>
+
+			<div class="pg hid" id=admin>
+				<h2>Admin</h2>
+
+				<h3>Server</h3>
+
+				<button onclick="server_restart()">Restart Server</button> (Don't do this)
+				<p>
+
+				<button onclick="server_stop()">Stop Server</button> (Don't do this either)
+				<p>
+
+				<script>
+
+					function server_restart() {
+						socket.emit( "admin_server_restart", {}, data => {
+							log( data );
+						});
+					}
+
+					function server_stop() {
+						socket.emit( "admin_server_stop", {}, data => {
+							log( data );
+						});
+					}
+
+				</script>
+
+				<h3>Users</h3>
+				<table class=users width=100%>
+					<tr>
+						<td> Username </td>
+						<td> Email </td>
+						<td> Enabled </td>
+					</tr>
+					<tr id=tpl_user >
+						<td> __username__ </td>
+						<td> __email__ </td>
+						<td> __enabled__ </td>
+					</tr>
+				</table>
+				<p>
+
+				<script>
+					replicate( "tpl_user", [] );
+					socket.emit( "user_list", {}, data => {
+						replicate( "tpl_user", Object.values( data.users ) );
+					});
+				</script>
+
+			</div>
+
+
+			<div class="pg hid" id="talk">
+				<!--h2>Talk</h2-->
+
+				<form name=chatbox>
+					<div id=chat_out rows=12></div>
+
+					<div class=hid>
+						<div class=bubble id=tpl_chat title="__when__">
+							<div class=text>__text__</div>
+							<div class=when >__ago__</div>
+						</div>
+					</div>
+
+					<div style="display:flex; justify-content: space-between;">
+						<div> <span id=talk_name></span> </div>
+						<div> Viewers: <span id=num_watchers></span> </div>
+					</div>
+					<div id=chat_input_area class=hid>
+						<div style="display: flex">
+							<div style="display: inline-block; zidth: 10vw;">
+								You&nbsp;are&nbsp;"<span id=chat_name></span>"&nbsp;&nbsp;
+							</div>
+							<input type=text id=chat_in placeholder="Type your msg here">
+							<input type=submit value=Send>
+						</div>
+					</div>
+				</form>
+				<p>
+
+				<script>
+					let m = path.match( /\/talk\/([A-Za-z0-9]+)/ );
+					if( m ) {
+
+						let key = m[ 1 ];			// the unique conversation key
+						log( "talk page key " + key );
+
+						window.callback = function() {
+							let email = prompt( "Please enter your email address (this will not be shared):" );
+							if( email ) {
+								socket.emit( "callback", { key, email }, data => {
+									if( data.error ) {
+										alert( "ERROR: " + data.error );
+									}
+									else {
+										alert( "Thank you.  An email will be sent to you when an SE arrives." );
+									}
+								});
+							}
+						}
+
+						socket.emit( "fetch", { key }, data => {	// fetch the entire conv
+							if( data.error ) {
+								alert( "ERROR: " + data.error );
+								doc.location = "/";
+							}
+
+							let f = doc.forms.chatbox;		// form element
+							let els = f.elements;			// elements array
+							let chat_out = getEl("chat_out"); // chat_out element
+							let chat_in = els.chat_in;		// chat_in element
+
+							let conv = data.conv;			// the conv object
+							let chats = conv.chats;			// array of chat objects, each has a uid of who said it
+							let members = conv.members;		// members object, used to map uid's to names
+
+							getEl( "talk_name" ).innerHTML = conv.talk_name;
+
+							// appends a text to the output window prefixed by sender's name
+							let out = function( chat ) {
+								let o = {
+									text: chat.text,
+									when: ts2us_mdyhm(chat.uts_created),
+									ago: agoStr( chat.uts_created )
+								};
+								let e = getEl( "tpl_chat" ).cloneNode( true );
+								e.id = "";
+								if( chat.uid == "SYS" ) {
+									e.addClass( "sys" );
+								}
+								else {
+									let name = members[ chat.uid ];
+									if( name ) 
+										e.addClass( name.lcase() ); //(name == "SE") ? "se" : "il" );
+								}
+								e.innerHTML = replicate.substitute( e.innerHTML, o );
+
+								let scrl = chat_out.scrollTop >= (chat_out.scrollHeight - chat_out.clientHeight);;
+								chat_out.appendChild( e );
+								if( scrl ) {
+									chat_out.scrollTop = chat_out.scrollHeight;
+								}
+
+							};
+
+							let show_num_watchers = function( n ) {
+								getEl( "num_watchers" ).innerHTML = n;
+							}
+
+							// populate chat output with all the texts to start out
+							conv.chats.forEach( chat => {
+								out( chat );
+							});
+
+
+							// subscribe to activity on this conv, even if I can't submit texts.
+							// server side will spontaneously send 
+							socket.emit( "watch", { key }, data => {
+								if( ! data.error ) {
+									log( "watching talk " + key );
+								}
+							});
+
+							socket.on( "msg", data => {	// add activity msg handler
+								log( "msg " +  o2j(data) );
+								let msg = data.msg;
+								if( msg == "chat" ) {
+									//log( "CHAT: " + data.chat.text );
+									if( window.typing_node ) {
+										clearTimeout( window.typing_tid );
+										window.typing_node.remove();
+									}
+									out( data.chat );		// append to chat output
+								}
+								else
+								if( msg == "arrive" ) {
+									//log( "SE arrived !" );
+									setTimeout( reload, 5000 );	// reload page
+								}
+								else
+								if( msg == "num_watchers" ) {
+									//log( "num_watchers = " + data.num_watchers );
+									show_num_watchers( data.num_watchers );
+								}
+								else
+								if( msg == "typing" ) {
+									// someone is typing
+									if( data.uid != uid ) {
+										// and it's not me
+										log( "someone is typing " + data.uid );
+
+										if( window.typing_node ) {
+											clearTimeout( window.typing_tid );
+											window.typing_node.remove();
+										}
+										let e = getEl( "tpl_chat" ).cloneNode( true );
+										e.id = "";
+										let name = members[ data.uid ];
+										if( name ) {
+											e.addClass( name.lcase() );
+											e.innerHTML = "<img src='/typing.gif' style='height:1em;'/>";
+
+											let scrl = chat_out.scrollTop >= (chat_out.scrollHeight - chat_out.clientHeight);
+											chat_out.appendChild( e );
+											log( "top="+chat_out.scrollTop );
+											log( "scrlhght="+chat_out.scrollHeight );
+											log( "clnthght="+chat_out.clientHeight );
+											if( scrl ) {
+														chat_out.scrollTop = chat_out.scrollHeight;
+											}
+
+											window.typing_node = e;
+											window.typing_tid = setTimeout( function() {
+												window.typing_node.remove();
+											}, 5000 );
+										}
+									}
+								}
+
+							});
+
+							let uid = get_uid( key );		// get user's uid for this conv from localStorage
+							if( ! uid ) {
+								// no uid set ... you're not the first in the convo (second or later)
+								socket.emit( "join", { key, name: "SE" }, data => {	// try to join as name "SE"
+									if( ! data.error ) {
+										log( "joined " + key + " as SE" );
+										set_uid( key, data.uid );	// set uid returned if successful
+										setTimeout( reload, 1000 );	// reload page
+									}
+								});
+							}
+							if( uid ) {
+								// the user has a uid for this convo (supposedly)
+								let name = members[ uid ];	// mape the uid to a name
+								if( name ) {
+									// the user has a name
+									getEl( "chat_name" ).innerHTML = name;			// insert name into page
+									getEl( "chat_input_area" ).remClass( "hid" );	// make the text input visible
+
+									// ---------------------
+									//getEl( "chat_in" ).focus();
+									chat_in.focus();
+									let send_typing = function() {
+										socket.emit( "typing", { key, uid }, data => {
+										});
+									}
+									let typing_tick = 0;
+									let typing_countdown = 0;
+									setInterval( function() {
+										//log("tick "+typing_tick+" count "+typing_countdown);
+										typing_tick += 1;
+										if( typing_tick % 4 == 0 && typing_countdown > 0 ) {
+											send_typing();
+										}
+										if( typing_countdown > 0 ) {
+											typing_countdown -= 1;
+										}
+									}, 1000 );
+									chat_in.onkeydown = function() {
+										//log("keydown");
+										if( typing_countdown == 0 ) {
+											send_typing();
+										}
+										typing_countdown = 6;
+									};
+									// ---------------------
+
+									// install submit handler to form, since uid appears to be authorized to chat
+									f.onsubmit = function( evt ) {
+										let text = chat_in.value.trim();			// get the text of the chat
+										chat_in.value = "";
+										typing_tick = 0;
+										typing_countdown = 0;
+										socket.emit( "append", { key, text, uid }, data => {	// send to server
+											//if( ! data.error ) {
+											//}
+										});
+										return false;
+									}
+								}
+								// else - shouldn't really happen as uid and name should be present in tandem.
+							}
+
+						});
+
+					}
+				</script>
+			</div>
+
+			<div class="pg hid" id=terms>
+				<h2>Terms of Service and Privacy Policy</h2>
+
+				<h3>Terms of Service</h3>
+
+				Your use of this website constitutes your agreement to abide by these terms of service.
+				<p>
+
+				You acknowledge that WEBSITE does not make any representations or warranties about the material, data, and information, such as data files, text, computer software, code, music, audio files or other sounds, photographs, videos, or other images (collectively, the “Content”) which you may have access to as part of, or through your use of, the Services. Under no circumstances is WEBSITE liable in any way for any Content, including, but not limited to: any infringing Content, any errors or omissions in Content, or for any loss or damage of any kind incurred as a result of the use of any Content posted, transmitted, linked from, or otherwise accessible through or made available via the Services. You understand that by using the Services, you may be exposed to Content that is offensive, indecent, or objectionable.
+				<p>
+
+				You agree that you are solely responsible for your reuse of Content made available through the Services, including providing proper attribution. You should review the terms of the applicable license before you use the Content so that you know what you can and cannot do.
+				<p>
+
+				<h3>Privacy Policy</h3>
+
+				We will collect, and record the text of conversations on the "talk" page.  These conversations will be used for reference and research.  By using the "talk" page, you grant us a perpetual unlimited right to use the text in any way by us and/or its owners and affiliates.
+				<p>
+				
+				We will collect any information you provide to us. This information may include but is not limited to your name, email address, phone number, mailing address, payment information, photo, geographic location, and your social media handles.  We may also collect additional demographic and other information about you in connection with our conferences and events (e.g., dietary and other preferences), and the provision of this information to us by you is optional.
+				<p>
+
+				We may automatically collect certain information about the computer or devices (including mobile devices or tablets) you use to access the Services. As described further below, we may collect and analyze (a) device information such as IP addresses, location information (by country and city), unique device identifiers, IMEI and TCP/IP address, browser types, browser language, operating system, mobile device carrier information, and (b) information related to the ways in which you interact with the Services, such as referring and exit web pages and URLs, platform type, the number of clicks, domain names, landing pages, pages and content viewed and the order of those pages, statistical information about the use of the Services, the amount of time spent on particular pages, the date and time you used the Services, the frequency of your use of the Services, error logs, and other similar information. As described further below, we may use third-party analytics providers and technologies, including cookies and similar tools, to assist in collecting this information.
+				<p>
+
+				We also collect data about your use of the Services through the use of Internet server logs and online tracking technologies, like cookies and/or tracking pixels.
+				If you receive email from us, we may use certain analytics tools, to capture data.  This data allows us to gauge the effectiveness of our communications and marketing campaigns.  As we adopt additional technologies, we may also gather additional information through other methods.
+				<p>
+
+				<p>
+
+			</div>
+
+
+			<script>
+
+				let a = path.split( "/" );
+				let pg = a[ 1 ] || "home";
+				let e = getEl( pg );
+				if( e ) {
+					//log( "showing page " + pg );
+					e.remClass( "hid" );
+				}
+				else {
+					log( "No page: " + pg );
+				}
+
+			</script>
+
+		</div>
+
+		<br>
+		<br>
+		<br>
+	</body>
+</html>
