@@ -8,6 +8,8 @@ Two main reasons:
 1. We should have a single, well-known, easily linked place/page where anyone can go to be SE'd
 2. The page will record conversations in well-ordered, machine readable form for reference and study.
 
+See design.txt for more info
+
 
 ## GitHub repo "engage-site"
 This is a browser client that uses websockets to interface

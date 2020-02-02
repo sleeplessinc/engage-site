@@ -1,0 +1,140 @@
+
+TODO
+=============================
+
+Typing "..." indicator when people are typing.
+
+ayylienToday at 12:09 PM
+	@JoeAnderson is your site dedicated to certain type of SE claims?
+	suggestion: IL types in claim first along with their name, that becomes conversation title.
+		then the SE conductor can be added in
+		like: ayylien on The belief in the existence of God
+
+Timestamps
+
+Add option on talk page that IL can use to register to be notified when an SE
+becomes available. (service worker notice, email notice options?)
+
+New visual design, less plain and business like; add graphics/faces?
+
+Avoid the SE/IL abbreviations in copy.
+
+Make sure talk page fits everything on screen
+Make the chat vertically fill the page so it does not require so much scrolling.
+
+Fix button appearance on mobile safari
+
+Add a message that talk can be bookmarked
+Maybe link copy button?
+
+Find out if the localStorage data is being lost on mobile too easily.
+
+WEE_GEE
+	1: Welcome Page: Make the 'Talks' list include IL and SE names. eg. 'Michael with Joe'.
+	2: Page background is limited in size vertically (all pages).
+	3: Add a 'Site last visited' timer.
+	4: Engage page: Names at top on each side with time zone of each participent.
+	5: Add talk txt size + and - option.
+
+notifications via
+	* service workers
+	* discord
+	* SMS
+
+
+Engage
+===============================
+
+User Experience
+-----------------
+
+	User visits home page
+
+	Page shows:
+
+		Welcome to SE Engage!
+		Click "Engage Now" if you'd like to be interviewed by an SE.
+
+		[ Engage Now ]
+
+	User clicks, page changes to:
+
+		What belief would you like to have challenged?
+
+		< FREE FORM TEXT BOX >
+
+		[ Submit ]
+
+	User enters "i believe in god", clicks Submit, page changes to:
+
+		Stand by while an SE is summoned to engage with you ...
+
+		[ Cancel ]
+	
+	Clicking cancel returns to home page
+
+	If 30 seconds elapse while waiting, this appears:
+
+		Sorry, no SE's available right now. Try later
+	
+	... otherwise page changes a basic chat window view;
+
+		An SE has been located and is ready to interview you!
+		Note: Conversation will be recorded.
+
+		+--------------------------------------------------+
+		| SE: Hi, my name is Betty.  I'll be your SE today.
+		| SE: It says you belive in god?
+		|
+		| IL: yes jesus died for my sins
+		|
+		| SE: Okay let's talk about that ...
+		| ....
+		+--------------------------------------------------+
+
+	A standard, simple text-chat ensues.
+
+
+Under the covers:
+-----------------
+	
+	The "wait for an SE" process involves the page sending out notifications to
+	people on a list who've volunteered to participate.  The first SE to engage
+	is then allowed to converse with the IL.  Others can go to the conversation
+	page, but will only be able to lurk.
+
+	Each conversation page will have a unique URL so that it can be bookmarked.
+	The SE and IL can then return to that page anytime to continue their talk
+	if they want.
+
+	The entire conversation is carefully logged/stored so that it can be used 
+	for research or reference purposes.  [1]
+
+	The data will be store in a database with unique identifiers for each
+	conversation between a given SE and a given IL. Each chat entry will be
+	stored as being from either the SE or the IL so they can be clearly 
+	distinguished.
+
+
+Possible Future additions
+---------------------------
+
+	Button to download the chat.
+
+	Ability to request specific SEs?
+
+	If Joe's ML experimentation is fruitful, the SE might see help in the form
+	of tags/flags, like "IL says they 'grew up that way'", or "IL mentioned faith"
+	along with hints, like "Apply the OTF", or "Ask IL for their own definition of faith", etc.
+
+	Interviews can be stored and indexed simply as reference material in transcript form,
+	or published on the transcripts page of SE site.
+
+
+
+[1] Joe is particularly interested in the recorded convo because he wants to use
+    it for working with machine-learning that can recognize logical fallacies and other
+	kinds of IL responses.
+
+
+
