@@ -46,7 +46,6 @@
 			</script>
 
 
-			<!--a href="/"><h1>Street Epistemology <span class="blue">➔</span> Engage</h1></a-->
 			<a href="/"><h1><span class="blue">➔</span> Engage</h1></a>
 
 
@@ -70,8 +69,6 @@
 
 				<script>
 					doc.forms.pretalk.onsubmit = function( evt ) {
-						//evt.preventDefault();
-						//let form = doc.forms.pretalk;
 						let els = evt.target.elements;
 						let talk_name = els.talk_name.value.trim();
 						socket.emit( "create", { name: "IL", talk_name }, data => {
@@ -145,9 +142,6 @@
 							let talks = data.talks;
 
 							talks.forEach( talk => {
-								//if( ! talk.name ) {
-								//	talk.name = "Talk " + ts2my( talk.uts_created );
-								//}
 								talk.started = agoStr( talk.uts_created );
 								if( talk.num_watchers == 0 )
 									talk.num_watchers = "";
@@ -177,11 +171,6 @@
 
 				<h2>About</h2>
 
-				<!--
-				Street Epistemology is the practice of engaging others in
-				respectful, sincere, and open discussion
-				about the best ways of knowing what is true.
-				-->
 				Epistemology is the theory of knowledge,
 				especially with regard to its methods,
 				validity, and scope.
@@ -509,7 +498,6 @@
 
 
 			<div class="pg hid" id="talk">
-				<!--h2>Talk</h2-->
 
 				<form name=chatbox>
 					<div id=chat_out rows=12></div>
@@ -590,7 +578,7 @@
 								else {
 									let name = members[ chat.uid ];
 									if( name ) 
-										e.addClass( name.lcase() ); //(name == "SE") ? "se" : "il" );
+										e.addClass( name.lcase() );
 								}
 								e.innerHTML = replicate.substitute( e.innerHTML, o );
 
@@ -698,7 +686,6 @@
 									getEl( "chat_input_area" ).remClass( "hid" );	// make the text input visible
 
 									// ---------------------
-									//getEl( "chat_in" ).focus();
 									chat_in.focus();
 									let send_typing = function() {
 										socket.emit( "typing", { key, uid }, data => {
@@ -707,7 +694,6 @@
 									let typing_tick = 0;
 									let typing_countdown = 0;
 									setInterval( function() {
-										//log("tick "+typing_tick+" count "+typing_countdown);
 										typing_tick += 1;
 										if( typing_tick % 4 == 0 && typing_countdown > 0 ) {
 											send_typing();
@@ -717,7 +703,6 @@
 										}
 									}, 1000 );
 									chat_in.onkeydown = function() {
-										//log("keydown");
 										if( typing_countdown == 0 ) {
 											send_typing();
 										}
@@ -732,8 +717,6 @@
 										typing_tick = 0;
 										typing_countdown = 0;
 										socket.emit( "append", { key, text, uid }, data => {	// send to server
-											//if( ! data.error ) {
-											//}
 										});
 										return false;
 									}
@@ -787,7 +770,6 @@
 				let pg = a[ 1 ] || "home";
 				let e = getEl( pg );
 				if( e ) {
-					//log( "showing page " + pg );
 					e.remClass( "hid" );
 				}
 				else {
