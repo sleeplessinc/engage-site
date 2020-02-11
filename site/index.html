@@ -363,6 +363,13 @@
 							return false;
 						}
 					}
+					function scroll2(z){
+						chat_out.scrollTo({
+							top: z===0?0:chat_out.scrollHeight,
+							left: 0,
+							behavior: 'smooth'
+						});
+					}
 				</script>
 
 			</div>
@@ -510,8 +517,12 @@
 					</div>
 
 					<div style="display:flex; justify-content: space-between;">
-						<div> <span id=talk_name></span> </div>
-						<div> Viewers: <span id=num_watchers></span> </div>
+						<div> <span id="talk_name"></span> </div>
+						<div>
+							<input id="top" type="button" value="V" style="transform: rotate(180deg);" onclick="scroll2(0)">
+							<input id="bot" type="button" value="V" onclick="scroll2()">
+							Viewers: <span id="num_watchers">1</span>
+						</div>
 					</div>
 					<div id=chat_input_area class=hid>
 						<div style="display: flex">
